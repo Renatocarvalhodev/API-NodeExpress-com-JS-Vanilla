@@ -3,7 +3,11 @@ import Produto from '../models/produto.model.js'
 
 export default class ProdutoController{
     static async index(req, res) {
-        const produtos = await Produto.findMany()
+        const produtos = await Produto.findMany({
+            include: {
+                fotos: true
+            }
+        })
         res.json(produtos)
     }
 
@@ -26,6 +30,9 @@ export default class ProdutoController{
         const produto = await Produto.findUnique({
             where: {
                 id: parseInt(req.params.id)
+            },
+            include: {
+                fotos: true
             }
         })
         if(!produto){
@@ -75,5 +82,18 @@ export default class ProdutoController{
             }
         })
         res.json({ message: 'Produto deletado com sucesso'})
+    
+
+        try{
+            await Produto.delete({
+                where: {
+                    id: parseInt(req.params.id)
+                }
+            })
+        } catch (error) {
+            return res.status(400).json({ message: "Erro não informado"})
+        }
+
+        res.status(204).json({ message: 'Usuário deletado com sucesso'})
     }
 }
